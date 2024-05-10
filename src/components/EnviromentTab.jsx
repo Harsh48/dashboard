@@ -46,6 +46,7 @@ const EnviromentTab = () => {
 
   const saveHandler = ()=>{
     localStorage.setItem("env", JSON.stringify(inputValue));
+    setEnvData(JSON.parse(localStorage.getItem('env'))? JSON.parse(localStorage.getItem('env')):[])
     setHidden(true)
     setInputValue([])
  }
@@ -89,7 +90,7 @@ const EnviromentTab = () => {
 
       <div
         id="drawer-navigation"
-        className={`shadow-xlt fixed top-0 right-0 z-40 w-5/12 h-screen p-4 bg-white dark:bg-gray-800 ${hidden? 'hidden': ''}`}
+        className={`shadow-xl fixed top-0 right-0 z-40 w-5/12 h-screen p-4 bg-white dark:bg-gray-800 ${hidden? 'hidden': ''}`}
         tabindex="-1"
         aria-labelledby="drawer-navigation-label"
       >
