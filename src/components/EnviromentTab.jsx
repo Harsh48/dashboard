@@ -78,7 +78,7 @@ const EnviromentTab = () => {
               </div>
             </div>
           </div>
-          {envData.length===0 && <div className="w-[600px] relative text-sm tracking-[-0.01em] leading-[20px] font-medium inline-block max-w-full">
+          {(envData && envData.length===0) && <div className="w-[600px] relative text-sm tracking-[-0.01em] leading-[20px] font-medium inline-block max-w-full">
             No environment variable created.
           </div>}
           {envData.map((item, i)=>{
