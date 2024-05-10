@@ -16,7 +16,7 @@ const EnviromentTab = () => {
   };
 
   useEffect(()=>{
-   setEnvData(JSON.parse(localStorage.getItem('env')))
+   setEnvData(JSON.parse(localStorage.getItem('env'))? JSON.parse(localStorage.getItem('env')):[])
   },[])
 
   const changeHandler = (file) => {
