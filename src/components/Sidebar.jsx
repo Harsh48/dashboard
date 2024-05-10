@@ -61,6 +61,11 @@ export function SidebarItem({ icon, text, active, alert }) {
           {text}
         </div>
       )}
+      {text==='Security' &&  <div className="rounded-sm bg-primary-800 flex flex-row items-start justify-start py-0.5 px-2 text-xs">
+            <div className="relative tracking-[-0.01em] leading-[18px] font-medium inline-block min-w-[26px]">
+              Beta
+            </div>
+          </div>}
     </li>
   );
 }
