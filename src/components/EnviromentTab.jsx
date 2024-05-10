@@ -1,15 +1,23 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import add from "../assets/add.svg";
 import download from "../assets/download.svg";
 import upload from "../assets/upload.svg";
 import InputFieldSet from "./InputFieldSet";
+import EnviromentDisplay from "./EnviromentDisplay";
 
 const EnviromentTab = () => {
   const inputRef = useRef(null);
+  const [hidden, setHidden] = useState(true)
   const [inputValue, setInputValue] = useState([]);
+  const [envData, setEnvData] = useState([])
+  const [uploadHidden, setUploadHidden] = useState(true)
   const fileHandler = () => {
     inputRef.current?.click();
   };
+
+  useEffect(()=>{
+   setEnvData(JSON.parse(localStorage.getItem('env')))
+  },[])
 
   const changeHandler = (file) => {
     const reader = new FileReader();
@@ -24,11 +32,28 @@ const EnviromentTab = () => {
           value: line.split("=")[1].trim().replace(regex, ''),
         });
       }
-      console.log(inputData)
       setInputValue(inputData)
     };
     reader.readAsText(file);
+    setUploadHidden(false)
+    inputRef.current.value=null
   };
+
+  const cancelHandler = ()=>{
+     setHidden(true)
+     setInputValue([])
+  }
+
+  const saveHandler = ()=>{
+    localStorage.setItem("env", JSON.stringify(inputValue));
+    setHidden(true)
+    setInputValue([])
+ }
+
+ useEffect(()=>{
+   if(inputValue.length===0) setUploadHidden(true)
+ },[inputValue])
+
 
   return (
     <>
@@ -40,7 +65,8 @@ const EnviromentTab = () => {
             </b>
             <div className="flex flex-row items-center justify-start gap-[4px]">
               <div
-                className="rounded flex flex-row items-center justify-start p-1"
+                onClick={()=>setHidden(false)}
+                className="cursor-pointer rounded flex flex-row items-center justify-start p-1"
                 data-drawer-target="drawer-navigation"
                 data-drawer-show="drawer-navigation"
                 aria-controls="drawer-navigation"
@@ -52,27 +78,31 @@ const EnviromentTab = () => {
               </div>
             </div>
           </div>
-          <div className="w-[600px] relative text-sm tracking-[-0.01em] leading-[20px] font-medium inline-block max-w-full">
+          {envData.length===0 && <div className="w-[600px] relative text-sm tracking-[-0.01em] leading-[20px] font-medium inline-block max-w-full">
             No environment variable created.
-          </div>
+          </div>}
+          {envData.map((item, i)=>{
+          return <EnviromentDisplay item={item} updateItem={setEnvData} index={i} inputValue={envData}/>
+          })}
         </div>
       </div>
 
       <div
         id="drawer-navigation"
-        class="fixed top-0 right-0 z-40 w-5/12 h-screen p-4 bg-white dark:bg-gray-800"
+        className={`shadow-xlt fixed top-0 right-0 z-40 w-5/12 h-screen p-4 bg-white dark:bg-gray-800 ${hidden? 'hidden': ''}`}
         tabindex="-1"
         aria-labelledby="drawer-navigation-label"
       >
         <button
+          onClick={cancelHandler}
           type="button"
           data-drawer-hide="drawer-navigation"
           aria-controls="drawer-navigation"
-          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 end-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+          className="mb-4 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 end-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
         >
           <svg
             aria-hidden="true"
-            class="w-5 h-5"
+            className="w-5 h-5"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -83,11 +113,11 @@ const EnviromentTab = () => {
               clip-rule="evenodd"
             ></path>
           </svg>
-          <span class="sr-only">Close menu</span>
+          <span className="sr-only">Close menu</span>
         </button>
-        <div class="py-4 overflow-y-auto">
+        <div className="py-6 overflow-y-auto">
           <div className="self-stretch rounded-lg box-border flex flex-col items-end justify-start py-2.5 px-[11px] gap-[24px] max-w-full text-xs text-grayscale-700 border-[1px] border-solid border-grayscale-200">
-            <div className="self-stretch flex flex-col items-end justify-start gap-[4px] max-w-full">
+            <div className={`self-stretch flex flex-col items-end justify-start gap-[4px] max-w-full ${!uploadHidden? 'hidden': ''}`}>
               <button className="cursor-pointer pt-[22px] px-[7px] pb-2.5 bg-grayscale-100 self-stretch rounded flex flex-col items-center justify-center border-[1px] border-dashed border-grayscale-300">
                 <div
                   onClick={fileHandler}
@@ -117,7 +147,7 @@ const EnviromentTab = () => {
                return(<InputFieldSet item={item} updateItem={setInputValue} index={i} inputValue={inputValue}/>)
             })}
             <div className="w-[180px] flex flex-row items-center justify-start gap-[8px]">
-              <button className="cursor-pointer py-1.5 px-[23px] bg-grayscale-0 flex-1 rounded overflow-hidden flex flex-row items-center justify-center border-[1px] border-solid border-grayscale-800">
+              <button onClick={cancelHandler} className="cursor-pointer py-1.5 px-[23px] bg-grayscale-0 flex-1 rounded overflow-hidden flex flex-row items-center justify-center border-[1px] border-solid border-grayscale-800">
                 <div className="flex flex-row items-center justify-center gap-[8px]">
                   <img
                     className="h-[22px] w-[18px] relative hidden"
@@ -134,7 +164,7 @@ const EnviromentTab = () => {
                   />
                 </div>
               </button>
-              <button className="cursor-pointer [border:none] py-2 px-6 bg-primary-800 rounded overflow-hidden flex flex-row items-center justify-center">
+              <button onClick={saveHandler} className="cursor-pointer [border:none] py-2 px-6 bg-primary-800 rounded overflow-hidden flex flex-row items-center justify-center">
                 <div className="flex flex-row items-center justify-center gap-[8px]">
                   <img
                     className="h-[22px] w-[18px] relative hidden"

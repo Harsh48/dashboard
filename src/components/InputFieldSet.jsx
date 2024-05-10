@@ -2,10 +2,17 @@ import deleteIcon from "../assets/delete.svg";
 
 const InputFieldSet = ({ item, updateItem, index, inputValue }) => {
   const changeHandler = (e, type) => {
-    let data = inputValue;
+    let data = [...inputValue];
     data[index][type] = e.target.value;
     updateItem(data);
   };
+
+  const deleteHandler = () =>{
+     let data = [...inputValue]
+     data.splice(index,index)
+     if(index===0) data.shift()
+     updateItem(data)
+  }
   return (
     <div className="self-stretch flex flex-row items-center justify-start gap-[24px] mq750:flex-wrap">
       <div className="flex-1 flex flex-row items-center justify-start gap-[16px] min-w-[190px] mq450:flex-wrap">
@@ -49,7 +56,7 @@ const InputFieldSet = ({ item, updateItem, index, inputValue }) => {
             />
           </div>
         </div>
-        <div className="rounded flex flex-row items-center justify-center p-1">
+        <div onClick={deleteHandler} className="cursor-pointer rounded flex flex-row items-center justify-center p-1">
           <img className="h-4 w-4 relative" alt="" src={deleteIcon} />
         </div>
       </div>

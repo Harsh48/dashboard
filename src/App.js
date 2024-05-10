@@ -13,8 +13,40 @@ import environment from "./assets/environment.svg";
 import alerts from "./assets/alerts.svg";
 import event from "./assets/event.svg";
 import EnviromentTab from "./components/EnviromentTab";
+import {useEffect, useState} from 'react'
+import axios from "axios";
 
 function App() {
+  const [selectedApp, setSelectedApp] = useState("");
+  const [appsData, setAppsData] = useState([]);
+
+  useEffect(() => {
+    const fetchAppsData = async () => {
+      try {
+        const res = await axios.get("https://retoolapi.dev/71NNjB/applications");
+        setAppsData(res.data);
+      } catch (err) {
+        setAppsData([]);
+        console.log(err);
+      }
+    };
+    fetchAppsData();
+  }, []);
+
+  useEffect(() => {
+    setSelectedApp(appsData[0]?.name);
+  },[appsData]);
+
+  const getStatusByName = (name) => {
+    const item = appsData.find(item => item.name === name);
+    return item ? item.status : "Not found";
+  };
+
+  const getObjectByName = (name) => {
+    const item = appsData.find(item => item.name === name);
+    return item || [];
+  }
+
   return (
     <div className="App h-screen flex flex-row justify-start">
       <Sidebar>
@@ -24,9 +56,9 @@ function App() {
         <SidebarItem icon={security} text="Security" />
       </Sidebar>
       <div className="flex-1 overflow-hidden bg-[#F8F8F8]">
-        <Header />
+        <Header appsData={appsData} selectedApp={selectedApp} setSelectedApp={setSelectedApp} status={getStatusByName(selectedApp)}/>
         <Tabs>
-          <Tab component={<OverviewTab/>} active>
+          <Tab component={<OverviewTab appData={getObjectByName(selectedApp)}/>} active>
             <div className="flex gap-1 items-center">
               <img src={overview} className="inline" alt="" />
               <span>Overview</span>
